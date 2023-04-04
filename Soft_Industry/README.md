@@ -188,6 +188,184 @@ public class WikipediaArticle {
 
 The main advantage of the approach used in this example is not in the lines of code written, although Serenity does reduce a lot of the boilerplate code that you would normally need to write in a web test. The real advantage is in the use of many small, stable classes, each of which focuses on a single job. This application of the _Single Responsibility Principle_ goes a long way to making the test code more stable, easier to understand, and easier to maintain.
 
+
+### How to execute tests
+
+Work with Serenity Cucumber framework is quite easy. It is just enough to paste this pom.xml file as on example below.w
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.serenitybdd.starter</groupId>
+    <artifactId>cucumber-starter</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Serenity BDD project using Cucumber</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <serenity.version>2.6.0</serenity.version>
+        <serenity.maven.version>2.6.0</serenity.maven.version>
+        <serenity.cucumber.version>2.6.0</serenity.cucumber.version>
+        <lombok.version>1.18.26</lombok.version>
+        <jackson.annotations.version>2.14.0</jackson.annotations.version>
+        <encoding>UTF-8</encoding>
+        <logback.version>1.4.6</logback.version>
+        <serenity-rest-assured.version>2.6.0</serenity-rest-assured.version>
+
+    </properties>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.annotations.version}</version>
+            </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-core</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-cucumber6</artifactId>
+            <version>${serenity.cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-screenplay</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-screenplay-webdriver</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-ensure</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-rest-assured</artifactId>
+            <version>${serenity-rest-assured.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <includes>
+                        <include>TestRunner.java</include>
+                    </includes>
+                    <parallel>classes</parallel>
+                    <parallel>methods</parallel>
+                    <useUnlimitedThreads>true</useUnlimitedThreads>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.serenity-bdd.maven.plugins</groupId>
+                <artifactId>serenity-maven-plugin</artifactId>
+                <version>${serenity.maven.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.serenity-bdd</groupId>
+                        <artifactId>serenity-core</artifactId>
+                        <version>${serenity.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>serenity-reports</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+The next stage requires creating initial class(TestRunner). It's going to be an entry point to the framework test execution. You can copy the example below for creating initial class
+```java
+@RunWith(CucumberWithSerenity.class)
+@CucumberOptions(
+plugin = {"pretty"},
+features = "src/test/resources/features"
+)
+public class TestRunner {}
+```
+
+Next step is going to be Creation a `.feature` class inside `/src/test/resources/features` package - this is your feature class which will contain your tests. You should follow Cucumber BDD rules when will create new feature class. You can find an example in this repository , which named `search_product_via_specific_criteria.feature`
+
+## Simplified WebDriver configuration and other Serenity extras
+The sample projects both use some Serenity features which make configuring the tests easier. In particular, Serenity uses the `serenity.conf` file in the `src/test/resources` directory to configure test execution options.
+
+Serenity uses WebDriverManager to download the WebDriver binaries automatically before the tests are executed.
+
+### Webdriver configuration
+The WebDriver configuration is managed entirely from this file, as illustrated below:
+```java
+webdriver {
+    driver = chrome
+}
+headless.mode = true
+
+chrome.switches="""--start-maximized;--test-type;--no-sandbox;--ignore-certificate-errors;
+                   --disable-popup-blocking;--disable-default-apps;--disable-extensions-file-access-check;
+                   --incognito;--disable-infobars,--disable-gpu"""
+
+```
 ## Executing the tests
 To run the sample project, you can either just run the `CucumberTestSuite` test runner class, or run either `mvn verify` or `gradle test` from the command line.
 
@@ -201,9 +379,6 @@ $ gradle clean test -Pdriver=firefox
 ```
 
 The test results will be recorded in the `target/site/serenity` directory.
-
-## Generating the reports
-Since the Serenity reports contain aggregate information about all of the tests, they are not generated after each individual test (as this would be extremenly inefficient). Rather, The Full Serenity reports are generated by the `serenity-maven-plugin`. You can trigger this by running `mvn serenity:aggregate` from the command line or from your IDE.
 
 They reports are also integrated into the Maven build process: the following code in the `pom.xml` file causes the reports to be generated automatically once all the tests have completed when you run `mvn verify`?
 
@@ -226,53 +401,3 @@ They reports are also integrated into the Maven build process: the following cod
                 </executions>
             </plugin>
 ```
-
-## Simplified WebDriver configuration and other Serenity extras
-The sample projects both use some Serenity features which make configuring the tests easier. In particular, Serenity uses the `serenity.conf` file in the `src/test/resources` directory to configure test execution options.  
-### Webdriver configuration
-The WebDriver configuration is managed entirely from this file, as illustrated below:
-```java
-webdriver {
-    driver = chrome
-}
-headless.mode = true
-
-chrome.switches="""--start-maximized;--test-type;--no-sandbox;--ignore-certificate-errors;
-                   --disable-popup-blocking;--disable-default-apps;--disable-extensions-file-access-check;
-                   --incognito;--disable-infobars,--disable-gpu"""
-
-```
-
-Serenity uses WebDriverManager to download the WebDriver binaries automatically before the tests are executed.
-
-### Environment-specific configurations
-We can also configure environment-specific properties and options, so that the tests can be run in different environments. Here, we configure three environments, __dev__, _staging_ and _prod_, with different starting URLs for each:
-```json
-environments {
-  default {
-    webdriver.base.url = "https://duckduckgo.com"
-  }
-  dev {
-    webdriver.base.url = "https://duckduckgo.com/dev"
-  }
-  staging {
-    webdriver.base.url = "https://duckduckgo.com/staging"
-  }
-  prod {
-    webdriver.base.url = "https://duckduckgo.com/prod"
-  }
-}
-```
-
-You use the `environment` system property to determine which environment to run against. For example to run the tests in the staging environment, you could run:
-```json
-$ mvn clean verify -Denvironment=staging
-```
-
-See [**this article**](https://johnfergusonsmart.com/environment-specific-configuration-in-serenity-bdd/) for more details about this feature.
-
-## Want to learn more?
-For more information about Serenity BDD, you can read the [**Serenity BDD Book**](https://serenity-bdd.github.io/theserenitybook/latest/index.html), the official online Serenity documentation source. Other sources include:
-* **[Byte-sized Serenity BDD](https://www.youtube.com/channel/UCav6-dPEUiLbnu-rgpy7_bw/featured)** - tips and tricks about Serenity BDD
-* For regular posts on agile test automation best practices, join the **[Agile Test Automation Secrets](https://www.linkedin.com/groups/8961597/)** groups on [LinkedIn](https://www.linkedin.com/groups/8961597/) and [Facebook](https://www.facebook.com/groups/agiletestautomation/)
-* [**Serenity BDD Blog**](https://johnfergusonsmart.com/category/serenity-bdd/) - regular articles about Serenity BDD
