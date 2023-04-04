@@ -1,31 +1,26 @@
-variables:
-  MAVEN_OPTS: -Dmaven.repo.local=.m2/repository
+image: maven:latest
 
-  image: maven:latest
-
-stages:
-  - build
-  - verify
-
-cache:
-  paths:
-    - .m2/repository
-    - target
-
-build_job:
+build:
   stage: build
-  tags:
-    - docker
-
   script:
-    - echo "Maven compile started"
-    - "mvn compile"
-test_job:
+    - mvn compile
+
+test:
   stage: test
-  tags:
-    - docker
-
   script:
-    - echo "Maven test started"
-    - "mvn verify"
-    - echo "Serenity report generation finished"
+    - mvn clean verify
+
+  after_script:
+    - echo "Preparing serenity report"
+    - rm -rf /var/lib/apt/lists/*
+    - apt-get update
+    - apt-cache gencaches
+    - apt-get install -y zip unzip
+    - zip -r serenity_report.zip ./target/site/serenity
+    - echo "Serenity report ready, you can download it from artifacts section"
+
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - ./serenity_report.zip
