@@ -7,8 +7,8 @@ Feature: Search for the product via different available criteria
   Scenario Outline:Verify request that is searching 'orange' returns correct status code and correct data
     When he calls endpoint "https://waarkoop-server.herokuapp.com/api/v1/search/demo/<expectedUrl>"
     Then he sees status code that equals '200'
-    And verifies that result is not empty
-    And verifies that title contains text "<expectedMessageInTitle>"
+    And he verifies that result is not empty
+    And he verifies that title contains text "<expectedMessageInTitle>"
 
     Examples:
       | expectedUrl | expectedMessageInTitle |
